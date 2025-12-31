@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Happy New Year 2026</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        height: 100vh;
+        background: radial-gradient(circle at top, #1a1a40, #050510);
+        overflow: hidden;
+        font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+        color: #fff;
+    }
+
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+
+    .container {
+        position: relative;
+        z-index: 10;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .card {
+        padding: 50px 80px;
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+        text-align: center;
+        animation: float 4s ease-in-out infinite;
+    }
+
+    h1 {
+        font-size: 64px;
+        background: linear-gradient(90deg, #00f2fe, #4facfe, #a6ffcb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+    }
+
+    .year {
+        font-size: 96px;
+        font-weight: bold;
+        color: #ffd700;
+        text-shadow: 0 0 30px #ffd700;
+    }
+
+    .countdown {
+        font-size: 26px;
+        margin: 20px 0;
+        letter-spacing: 2px;
+    }
+
+    .wish {
+        font-size: 24px;
+        line-height: 1.8;
+        opacity: 0.9;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0); }
+    }
+</style>
+</head>
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div class="container">
+    <div class="card">
+        <h1>Happy New Year</h1>
+        <div class="year">2026</div>
+        <div class="countdown" id="countdown"></div>
+        <div class="wish">
+            愿新的一年<br>
+            <strong>算法更稳  系统更强  人生不宕机</strong><br>
+            Bug 全清零，热爱持续编译 
+        </div>
+    </div>
+</div>
+
+<script>
+/* ========= 倒计时 ========= */
+const countdownEl = document.getElementById("countdown");
+const target = new Date("2026-01-01 00:00:00").getTime();
+
+function updateCountdown() {
+    const now = Date.now();
+    const diff = target - now;
+
+    if (diff <= 0) {
+        countdownEl.innerHTML = "🎉 新年已到，欢迎 2026！";
+        return;
+    }
+
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor(diff / (1000 * 60 * 60) % 24);
+    const m = Math.floor(diff / (1000 * 60) % 60);
+    const s = Math.floor(diff / 1000 % 60);
+
+    countdownEl.innerHTML =
+        `倒计时 ${d} 天 ${h} 时 ${m} 分 ${s} 秒`;
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+/* ========= Canvas 烟花 ========= */
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+class Particle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = Math.random() * 2 + 1;
+        this.color = `hsl(${Math.random() * 360},100%,60%)`;
+        this.vx = (Math.random() - 0.5) * 8;
+        this.vy = (Math.random() - 0.5) * 8;
+        this.life = 80;
+    }
+
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.05;
+        this.life--;
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+    }
+}
+
+let particles = [];
+
+function createFirework() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height * 0.5;
+    for (let i = 0; i < 80; i++) {
+        particles.push(new Particle(x, y));
+    }
+}
+
+function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
+
+    requestAnimationFrame(animate);
+}
+
+setInterval(createFirework, 800);
+animate();
+</script>
+
+</body>
+</html>
